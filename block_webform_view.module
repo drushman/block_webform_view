@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * Implements hook_block_info().
+ *
+ */
+function block_webform_view_block_info() {
+  $blocks['block_webform_join_group'] = array(
+    'info' => t('Block Webfom Join Group'),
+    'status' => FALSE,
+  );
+ return $blocks;
+}
+
+
+/**
+ * Implements hook_block_view().
+ *
+ * This hook generates the contents of the blocks themselves.
+ */
+function block_webform_view_block_view($delta = '') {
+  
+  if ($delta == 'block_webform_join_group') {
+    $block['subject'] = '<none>';
+    $block['content'] = block_webform_view_machine_name('join_group');
+  }
+  return $block;
+}
+
+
+function block_webform_view_machine_name($name) {
+  $select = db_select('defaultcontent', 'd')
+    ->fields('d', array('id'))
+    ->condition('name', $name)
+    ->execute()
+    ->fetchAll();
+  $nid = $select[0]->nid;
+  $block = module_invoke('webform', 'block_view', 'client-block-' . $nid);
+  return render($block); 
+}
